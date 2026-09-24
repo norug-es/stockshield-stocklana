@@ -1,0 +1,32 @@
+services:
+  stockshield:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    init: true
+    environment:
+      NODE_ENV: production
+      NEXT_TELEMETRY_DISABLED: "1"
+      HOSTNAME: 0.0.0.0
+      PORT: ${PORT:-3070}
+      NEXT_PUBLIC_SOLANA_RPC: ${NEXT_PUBLIC_SOLANA_RPC:-https://api.devnet.solana.com}
+      NEXT_PUBLIC_SOLANA_CLUSTER: ${NEXT_PUBLIC_SOLANA_CLUSTER:-devnet}
+      SOLANA_RPC_URL: ${SOLANA_RPC_URL:-https://api.devnet.solana.com}
+      PYTH_PRO_API_KEY: ${PYTH_PRO_API_KEY:-}
+      PYTH_PRO_FEED_ID: ${PYTH_PRO_FEED_ID:-}
+      PYTH_PRO_CHANNEL: ${PYTH_PRO_CHANNEL:-fixed_rate@200ms}
+      SWAT_BASE_URL: ${SWAT_BASE_URL:-https://bitcoiners.norug.es}
+      SWAT_API_KEY: ${SWAT_API_KEY:-}
+      SWAT_ASSET_RISK_PATH: ${SWAT_ASSET_RISK_PATH:-/api/solana/meteora/token/{mint}/launch-risk}
+      METEORA_NORMAL_CONFIG: ${METEORA_NORMAL_CONFIG:-}
+      METEORA_DEFENSIVE_CONFIG: ${METEORA_DEFENSIVE_CONFIG:-}
+      METEORA_POOL_ADDRESS: ${METEORA_POOL_ADDRESS:-}
+    ports:
+      - "${PORT:-3070}:${PORT:-3070}"
+    healthcheck:
+      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://127.0.0.1:$${PORT}/api/swat/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
