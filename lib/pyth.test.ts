@@ -11,4 +11,8 @@ describe('parsePythEvidence', () => {
   it('does not invent missing evidence', () => {
     expect(parsePythEvidence({})).toMatchObject({ price: null, confidencePct: null, ageSec: null });
   });
+  it('parses Pyth camelCase response properties', () => {
+    const result = parsePythEvidence({ parsed: [{ price: { price: '12345', conf: '25', expo: -2 }, feedUpdateTimestamp: 100, marketSession: 'REGULAR' }] }, 110_000);
+    expect(result).toMatchObject({ ageSec: 10, marketSession: 'REGULAR' });
+  });
 });

@@ -8,11 +8,12 @@ export async function GET(req: Request) {
   const asset = new URL(req.url).searchParams.get('asset');
   if (!asset) return NextResponse.json({ error: 'asset is required' }, { status: 400 });
   const base = process.env.SWAT_BASE_URL || 'https://bitcoiners.norug.es';
+  const apiKey = process.env.SWAT_API_KEY;
   try {
     const expandedPath = path.replaceAll('{mint}', encodeURIComponent(asset)).replaceAll('{asset}', encodeURIComponent(asset));
     const url = new URL(expandedPath, `${base.replace(/\/$/, '')}/`);
     if (expandedPath === path) url.searchParams.set('asset', asset);
-    const r = await fetch(url, { headers: process.env.SWAT_API_KEY ? { 'X-API-Key': process.env.SWAT_API_KEY } : {}, cache: 'no-store' });
+    const r = await fetch(url, { headers: apiKey && apiKey !== 'change-this-master-key' ? { 'X-API-Key': apiKey } : undefined, cache: 'no-store' });
     if (!r.ok) throw new Error(`SWAT HTTP ${r.status}`);
     const raw = await r.json();
     const riskValue = Number(raw.risk ?? raw.risk_score ?? raw.score);

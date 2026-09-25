@@ -20,11 +20,11 @@ export function parsePythEvidence(raw: unknown, nowMs = Date.now()): PythEvidenc
   const price = rawPrice == null ? null : rawPrice * 10 ** exponent;
   const rawConfidence = finite(priceNode.conf ?? row.confidence);
   const confidence = rawConfidence == null ? null : rawConfidence * 10 ** exponent;
-  const timestamp = finite(row.feed_update_timestamp ?? row.publish_time ?? root.timestamp);
+  const timestamp = finite(row.feedUpdateTimestamp ?? row.feed_update_timestamp ?? row.publishTime ?? row.publish_time ?? root.timestamp);
   return {
     price,
     confidencePct: price && confidence != null ? Math.abs(confidence / price) * 100 : null,
     ageSec: timestamp == null ? null : Math.max(0, Math.round(nowMs / 1000 - timestamp)),
-    marketSession: typeof row.market_session === 'string' ? row.market_session : null,
+    marketSession: typeof row.marketSession === 'string' ? row.marketSession : typeof row.market_session === 'string' ? row.market_session : null,
   };
 }

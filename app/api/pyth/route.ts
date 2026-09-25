@@ -30,7 +30,7 @@ export async function GET() {
       },
       body: JSON.stringify({
         priceFeedIds: [numericFeedId],
-        properties: ['price', 'confidence', 'market_session', 'feed_update_timestamp'],
+        properties: ['price', 'confidence', 'marketSession', 'feedUpdateTimestamp'],
         formats: [],
         parsed: true,
         channel
