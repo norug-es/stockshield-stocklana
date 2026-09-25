@@ -55,12 +55,11 @@ export default function Home() {
     fetch(`/api/swat/risk?asset=${encodeURIComponent(asset.contract_address)}`).then(r => r.json()).then(setSwatEvidence).catch(() => setSwatEvidence({source:'ERROR',risk:null,suspiciousExposurePct:null}));
   }, [asset.contract_address]);
 
-  async function selectAsset(symbol: string) {
-    const response = await fetch(`/api/prestocks/${encodeURIComponent(symbol)}`);
-    const data = await response.json();
-    if (data.asset) {
-      setAsset(data.asset);
-      setDataSource(data.source);
+  function selectAsset(symbol: string) {
+    const selected = assets.find((item) => item.symbol === symbol);
+    if (selected) {
+      setAsset(selected);
+      setDataSource('LIVE');
       setAttack(false);
     }
   }

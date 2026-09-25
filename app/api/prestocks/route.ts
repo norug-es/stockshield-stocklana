@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const response = await fetch('https://prestocks.com/api/prestocks', { cache: 'no-store' });
+    const response = await fetch('https://prestocks.com/api/prestocks', { next: { revalidate: 60 } });
     if (!response.ok) throw new Error(`PreStocks HTTP ${response.status}`);
     const assets = await response.json();
     return NextResponse.json({ source: 'LIVE', assets, fetchedAt: new Date().toISOString() });
