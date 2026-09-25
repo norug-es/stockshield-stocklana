@@ -13,6 +13,7 @@ services:
       NEXT_PUBLIC_SOLANA_RPC: ${NEXT_PUBLIC_SOLANA_RPC:-https://api.devnet.solana.com}
       NEXT_PUBLIC_SOLANA_CLUSTER: ${NEXT_PUBLIC_SOLANA_CLUSTER:-devnet}
       SOLANA_RPC_URL: ${SOLANA_RPC_URL:-https://api.devnet.solana.com}
+      SOLANA_MAINNET_RPC: ${SOLANA_MAINNET_RPC:-https://solana-rpc.publicnode.com}
       PYTH_PRO_API_KEY: ${PYTH_PRO_API_KEY:-}
       PYTH_PRO_FEED_ID: ${PYTH_PRO_FEED_ID:-}
       PYTH_PRO_CHANNEL: ${PYTH_PRO_CHANNEL:-fixed_rate@200ms}

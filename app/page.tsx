@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { Activity, AlertTriangle, CheckCircle2, ExternalLink, Radio, ShieldCheck, Zap } from 'lucide-react';
 import RiskRadar from '@/components/Radar';
 import WalletButton from '@/components/WalletButton';
+import AssetScanner from '@/components/AssetScanner';
+import PythFeedCatalog from '@/components/PythFeedCatalog';
 import { assessRisk } from '@/lib/risk';
 import { meteoraPolicy } from '@/lib/meteora';
 
@@ -27,6 +29,7 @@ const FALLBACK: Asset = {
 
 export default function Home() {
   const [asset, setAsset] = useState<Asset>(FALLBACK);
+  const [assets, setAssets] = useState<Asset[]>([FALLBACK]);
   const [dataSource, setDataSource] = useState('LOADING');
   const [attack, setAttack] = useState(false);
   const [swat, setSwat] = useState<'LIVE'|'OFF'|'CHECKING'>('CHECKING');
@@ -35,6 +38,9 @@ export default function Home() {
   const [meteora, setMeteora] = useState<{source:string; configured:boolean; programDeployed?:boolean; poolAddress?:string|null}>({source:'CHECKING', configured:false});
 
   useEffect(() => {
+    fetch('/api/prestocks').then(r => r.json()).then(j => {
+      if (Array.isArray(j.assets) && j.assets.length) setAssets(j.assets);
+    }).catch(() => undefined);
     fetch('/api/prestocks/OPENAI').then(r => r.json()).then(j => {
       if (j.asset) { setAsset(j.asset); setDataSource(j.source); }
       else setDataSource('FALLBACK');
@@ -48,6 +54,16 @@ export default function Home() {
   useEffect(() => {
     fetch(`/api/swat/risk?asset=${encodeURIComponent(asset.contract_address)}`).then(r => r.json()).then(setSwatEvidence).catch(() => setSwatEvidence({source:'ERROR',risk:null,suspiciousExposurePct:null}));
   }, [asset.contract_address]);
+
+  async function selectAsset(symbol: string) {
+    const response = await fetch(`/api/prestocks/${encodeURIComponent(symbol)}`);
+    const data = await response.json();
+    if (data.asset) {
+      setAsset(data.asset);
+      setDataSource(data.source);
+      setAttack(false);
+    }
+  }
 
   const decision = useMemo(() => assessRisk({
     markPrice: asset.markPrice,
@@ -103,6 +119,20 @@ export default function Home() {
           <div className="tiny center">Policy result · price + oracle + liquidity + wallets + SWAT</div>
         </div>
       </section>
+
+      <section className="panel assetSelector">
+        <div>
+          <div className="label">ASSET VALIDATION SET</div>
+          <h3>Choose a PreStocks asset to scan</h3>
+          <p className="tiny">The selected asset is re-evaluated across price integrity, oracle, SWAT and Solana mint evidence.</p>
+        </div>
+        <select value={asset.symbol} onChange={(event) => selectAsset(event.target.value)} aria-label="Select asset">
+          {assets.map((item) => <option key={item.symbol} value={item.symbol}>{item.symbol} · {item.name}</option>)}
+        </select>
+      </section>
+
+      <AssetScanner key={asset.contract_address} mint={asset.contract_address} />
+      <PythFeedCatalog />
 
       <section className="mainGrid">
         <div className="panel">
